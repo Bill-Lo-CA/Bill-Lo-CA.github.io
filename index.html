@@ -3,10 +3,242 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>My Website</title>
+  <link rel="stylesheet" href="style.css" />
+  <title>Bill Lo | Home</title>
 </head>
 <body>
-  <h1>Hello GitHub Pages</h1>
-  <p>This is my website.</p>
+  <header>
+    <div class="container nav">
+      <a class="brand" href="#top">
+        <span class="brand-mark"></span>
+        <span>Bill Lo</span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#posts">Posts</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </header>
+
+  <main id="top">
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-main">
+          <div class="eyebrow">Portfolio · Notes · Projects</div>
+          <p>
+            Hi, I’m Bill. I work across Software, AI, and Cyber Security.
+            This site is where I share selected projects, writeups, and things I’m currently learning.
+          </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#projects">View My Work</a>
+            <a class="btn btn-secondary" href="#posts">Read Notes</a>
+          </div>
+        </div>
+
+        <aside class="hero-side">
+          <div class="profile-card">
+            <div class="avatar"></div>
+            <div>
+              <h2>Bill Lo</h2>
+              <div class="meta">Programmer · Data Analyst · Pentester</div>
+            </div>
+          </div>
+
+          <div class="quick-links">
+            <a class="quick-link" href="#about">
+              <strong>About Me</strong>
+              <span>Background, skills, and focus areas</span>
+            </a>
+            <a class="quick-link" href="#projects">
+              <strong>Projects</strong>
+              <span>Selected work and portfolio items</span>
+            </a>
+            <a class="quick-link" href="#posts">
+              <strong>Latest Notes</strong>
+              <span>Writeups, ideas, and experiments</span>
+            </a>
+            <a class="quick-link" href="#contact">
+              <strong>Contact</strong>
+              <span>Email, GitHub, and LinkedIn</span>
+            </a>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>About</h2>
+            <p>A short intro and a few things I work with.</p>
+          </div>
+        </div>
+
+        <div class="section-panel about-grid">
+          <div>
+            <p>
+              I enjoy building useful solutions with programming, data tools, and web technologies.
+              My interests include analytics, software development, automation, and technical documentation.
+            </p>
+            <div class="stack-groups">
+              <div class="stack-group">
+                <h3 class="stack-title">Programming Languages</h3>
+                <div class="stack-list">
+                  <span class="tag">Python</span>
+                  <span class="tag">C#</span>
+                  <span class="tag">JavaScript</span>
+                  <span class="tag">Java</span>
+                  <span class="tag">SQL</span>
+                </div>
+              </div>
+
+              <div class="stack-group">
+                <h3 class="stack-title">Frameworks & Tools</h3>
+                <div class="stack-list">
+                  <span class="tag">React</span>
+                  <span class="tag">Tableau</span>
+                </div>
+              </div>
+
+              <div class="stack-group">
+                <h3 class="stack-title">Focus Areas</h3>
+                <div class="stack-list">
+                  <span class="tag">Cyber Security</span>
+                  <span class="tag">Artificial Intelligence</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="highlights">
+            <div class="highlight-item">Focused on practical solutions that are clean, usable, and easy to maintain.</div>
+            <div class="highlight-item">Interested in building dashboards, automations, web apps, and technical tools.</div>
+            <div class="highlight-item">Always learning through projects, experiments, and hands-on work.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="posts">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Latest Notes</h2>
+            <p>Same kind of section as the reference site, but with a more card-based layout.</p>
+          </div>
+          <a class="section-link" href="#">See all posts →</a>
+        </div>
+
+        <div class="posts-grid">
+          <article class="post-card">
+            <!-- <div class="post-meta">Apr 2026 · 5 min read</div>
+            <h3>Building a simple GitHub Pages personal site</h3>
+            <p>A quick walkthrough for setting up a personal homepage with HTML, CSS, and GitHub Pages.</p>
+            <a class="card-link" href="#">Read more</a> -->
+          </article>
+
+          <article class="post-card">
+            <!-- <div class="post-meta">Mar 2026 · 7 min read</div>
+            <h3>Notes on automation, data cleanup, and reporting</h3>
+            <p>Lessons learned from turning repetitive spreadsheet work into a more reliable workflow.</p>
+            <a class="card-link" href="#">Read more</a> -->
+          </article>
+
+          <article class="post-card">
+            <!-- <div class="post-meta">Feb 2026 · 6 min read</div>
+            <h3>What I learned from building small technical tools</h3>
+            <p>Thoughts on iteration, debugging, and why small tools often create outsized value.</p>
+            <a class="card-link" href="#">Read more</a> -->
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="projects">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Projects</h2>
+            <p>A few portfolio items and things worth highlighting.</p>
+          </div>
+        </div>
+
+        <div class="projects-grid">
+          <article class="project-card">
+            <!-- <div class="project-meta">Dashboard / Analytics</div>
+            <h3>Power BI Reporting Tool</h3>
+            <p>Built a reporting view for filtering and analyzing opportunity and design-in data by region, segment, and timeline.</p>
+            <a class="card-link" href="#">View project</a> -->
+          </article>
+
+          <article class="project-card">
+            <!-- <div class="project-meta">Web / Automation</div>
+            <h3>Jira and Confluence Workflow Tooling</h3>
+            <p>Worked on data extraction, field handling, and process improvements for project tracking and documentation flows.</p>
+            <a class="card-link" href="#">View project</a> -->
+          </article>
+
+          <article class="project-card">
+            <!-- <div class="project-meta">Programming / Learning</div>
+            <h3>Technical Study Notes</h3>
+            <p>Collected writeups on networking, security concepts, programming exercises, and implementation experiments.</p>
+            <a class="card-link" href="#">View project</a> -->
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Contact</h2>
+            <p>Ways to reach me or explore more of my work.</p>
+          </div>
+        </div>
+
+        <div class="contact-grid">
+          <div class="contact-card">
+            <h3>Email</h3>
+            <p>bill.lo.0528@gmail.com</p>
+          </div>
+          <div class="contact-card">
+            <h3>GitHub</h3>
+            <a href="https://github.com/Bill-Lo-CA">github.com/Bill-Lo-CA</a>
+          </div>
+          <div class="contact-card">
+            <h3>LinkedIn</h3>
+            <a href="https://www.linkedin.com/in/lagane100/">linkedin.com/in/lagane100</a>
+          </div>
+          <div class="contact-card">
+            <h3>Medium</h3>
+            <a href="https://medium.com/@lagane100">medium.com/@lagane100</a>
+          </div>
+          <div class="contact-card">
+            <h3>HackTheBox</h3>
+            <a href="https://app.hackthebox.com/public/users/3095335">hackthebox.com/profile/laganeca</a>
+          </div>
+          <div class="contact-card">
+            <h3>Location</h3>
+            <p>Ottawa, Canada</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-panel">
+      <div>© 2026 Bill Lo. Built for GitHub Pages.</div>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#posts">Posts</a>
+        <a href="#projects">Projects</a>
+      </div>
+    </div>
+  </footer>
 </body>
 </html>
