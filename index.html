@@ -3,20 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Bill Lo's software, AI, and cybersecurity portfolio: ContextBubble, SOC labs, HTB writeups, and automation projects." />
   <link rel="stylesheet" href="style.css" />
-  <title>Bill Lo | Home</title>
+  <title>Bill Lo | Software, AI & Cybersecurity Portfolio</title>
 </head>
 <body>
   <header>
     <div class="container nav">
-      <a class="brand" href="#top">
-        <span class="brand-mark"></span>
+      <a class="brand" href="#top" aria-label="Back to top">
+        <span class="brand-mark">BL</span>
         <span>Bill Lo</span>
       </a>
       <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#posts">Posts</a></li>
+        <li><a href="#focus">Focus</a></li>
         <li><a href="#projects">Projects</a></li>
+        <li><a href="#security">Security</a></li>
+        <li><a href="#writing">Writing</a></li>
         <li><a href="#contact">Contact</a></li>
       </ul>
     </div>
@@ -26,132 +28,75 @@
     <section class="hero">
       <div class="container hero-grid">
         <div class="hero-main">
-          <div class="eyebrow">Portfolio · Notes · Projects</div>
+          <div class="eyebrow">Software Engineering · AI Tooling · Cybersecurity</div>
+          <h1>Building practical tools for learning, automation, and security analysis.</h1>
           <p>
-            Hi, I’m Bill. I work across Software, AI, and Cyber Security.
-            This site is where I share selected projects, writeups, and things I’m currently learning.
+            Hi, I’m Bill Lo. I bring a software engineering background into applied AI and cybersecurity work:
+            browser extensions, local AI workflows, SOC-style investigations, automation, and technical writeups.
           </p>
           <div class="hero-actions">
-            <a class="btn btn-primary" href="#projects">View My Work</a>
-            <a class="btn btn-secondary" href="#posts">Read Notes</a>
+            <a class="btn btn-primary" href="#projects">View Featured Work</a>
+            <a class="btn btn-secondary" href="https://github.com/Bill-Lo-CA">GitHub Profile</a>
+          </div>
+          <div class="hero-list">
+            <span>Open to SOC Analyst, Software Engineer, and AI / Automation roles</span>
+            <span>Ottawa, Canada</span>
           </div>
         </div>
 
         <aside class="hero-side">
           <div class="profile-card">
-            <div class="avatar"></div>
+            <div class="avatar">BL</div>
             <div>
               <h2>Bill Lo</h2>
-              <div class="meta">Programmer · Data Analyst · Pentester</div>
+              <div class="meta">Software Engineer · SOC Learner · AI Builder</div>
             </div>
           </div>
 
+          <div class="status-pill">Current focus</div>
           <div class="quick-links">
-            <a class="quick-link" href="#about">
-              <strong>About Me</strong>
-              <span>Background, skills, and focus areas</span>
-            </a>
             <a class="quick-link" href="#projects">
-              <strong>Projects</strong>
-              <span>Selected work and portfolio items</span>
+              <strong>ContextBubble</strong>
+              <span>Chromium extension for timestamped YouTube learning notes</span>
             </a>
-            <a class="quick-link" href="#posts">
-              <strong>Latest Notes</strong>
-              <span>Writeups, ideas, and experiments</span>
+            <a class="quick-link" href="#security">
+              <strong>SOC Practice</strong>
+              <span>SIEM labs, alert triage, Windows/Linux log analysis</span>
+            </a>
+            <a class="quick-link" href="#writing">
+              <strong>Writeups</strong>
+              <span>Medium articles, HTB notes, investigation reports</span>
             </a>
             <a class="quick-link" href="#contact">
               <strong>Contact</strong>
-              <span>Email, GitHub, and LinkedIn</span>
+              <span>Email, GitHub, LinkedIn, Medium, and HTB</span>
             </a>
           </div>
         </aside>
       </div>
     </section>
 
-    <section id="about">
+    <section id="focus">
       <div class="container">
         <div class="section-head">
           <div>
-            <h2>About</h2>
-            <p>A short intro and a few things I work with.</p>
+            <h2>Recent Focus</h2>
+            <p>Where my current projects, job search, and learning work are converging.</p>
           </div>
         </div>
 
-        <div class="section-panel about-grid">
-          <div>
-            <p>
-              I enjoy building useful solutions with programming, data tools, and web technologies.
-              My interests include analytics, software development, automation, and technical documentation.
-            </p>
-            <div class="stack-groups">
-              <div class="stack-group">
-                <h3 class="stack-title">Programming Languages</h3>
-                <div class="stack-list">
-                  <span class="tag">Python</span>
-                  <span class="tag">C#</span>
-                  <span class="tag">JavaScript</span>
-                  <span class="tag">Java</span>
-                  <span class="tag">SQL</span>
-                </div>
-              </div>
-
-              <div class="stack-group">
-                <h3 class="stack-title">Frameworks & Tools</h3>
-                <div class="stack-list">
-                  <span class="tag">React</span>
-                  <span class="tag">Tableau</span>
-                </div>
-              </div>
-
-              <div class="stack-group">
-                <h3 class="stack-title">Focus Areas</h3>
-                <div class="stack-list">
-                  <span class="tag">Cyber Security</span>
-                  <span class="tag">Artificial Intelligence</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div class="highlights">
-            <div class="highlight-item">Focused on practical solutions that are clean, usable, and easy to maintain.</div>
-            <div class="highlight-item">Interested in building dashboards, automations, web apps, and technical tools.</div>
-            <div class="highlight-item">Always learning through projects, experiments, and hands-on work.</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="posts">
-      <div class="container">
-        <div class="section-head">
-          <div>
-            <h2>Latest Notes</h2>
-            <p>Same kind of section as the reference site, but with a more card-based layout.</p>
-          </div>
-          <a class="section-link" href="#">See all posts →</a>
-        </div>
-
-        <div class="posts-grid">
-          <article class="post-card">
-            <!-- <div class="post-meta">Apr 2026 · 5 min read</div>
-            <h3>Building a simple GitHub Pages personal site</h3>
-            <p>A quick walkthrough for setting up a personal homepage with HTML, CSS, and GitHub Pages.</p>
-            <a class="card-link" href="#">Read more</a> -->
+        <div class="focus-grid">
+          <article class="focus-card">
+            <h3>AI-assisted learning tools</h3>
+            <p>Building ContextBubble as a local-first browser extension that turns YouTube videos into reviewed, timestamped learning bubbles.</p>
           </article>
-
-          <article class="post-card">
-            <!-- <div class="post-meta">Mar 2026 · 7 min read</div>
-            <h3>Notes on automation, data cleanup, and reporting</h3>
-            <p>Lessons learned from turning repetitive spreadsheet work into a more reliable workflow.</p>
-            <a class="card-link" href="#">Read more</a> -->
+          <article class="focus-card">
+            <h3>SOC investigation practice</h3>
+            <p>Practicing SIEM workflows, alert validation, log analysis, documentation, and clear incident-response reporting.</p>
           </article>
-
-          <article class="post-card">
-            <!-- <div class="post-meta">Feb 2026 · 6 min read</div>
-            <h3>What I learned from building small technical tools</h3>
-            <p>Thoughts on iteration, debugging, and why small tools often create outsized value.</p>
-            <a class="card-link" href="#">Read more</a> -->
+          <article class="focus-card">
+            <h3>Developer workflow automation</h3>
+            <p>Exploring tools that reduce repetitive work, connect GitHub/Medium/portfolio content, and support more responsible open-source contribution.</p>
           </article>
         </div>
       </div>
@@ -161,31 +106,149 @@
       <div class="container">
         <div class="section-head">
           <div>
-            <h2>Projects</h2>
-            <p>A few portfolio items and things worth highlighting.</p>
+            <h2>Featured Projects</h2>
+            <p>Selected work that best represents my current software, AI, and security direction.</p>
           </div>
         </div>
 
+        <article class="featured-card">
+          <div>
+            <div class="project-meta">Featured · AI Learning Assistant · Browser Extension</div>
+            <h3>ContextBubble</h3>
+            <p>
+              A functional Chromium extension prototype for showing reviewed, timestamped learning notes on YouTube videos.
+              The backend can use YouTube captions when available, fall back to local ASR with whisper.cpp, then run concept generation,
+              review, validation, caching, and bubble rendering on the page.
+            </p>
+            <div class="card-tags">
+              <span class="tag">Chromium Extension</span>
+              <span class="tag">Python Backend</span>
+              <span class="tag">whisper.cpp</span>
+              <span class="tag">Gemini / Ollama</span>
+              <span class="tag">Local Auth</span>
+            </div>
+          </div>
+          <div class="featured-actions">
+            <a class="btn btn-primary" href="https://github.com/Bill-Lo-CA/contextbubble">View Repository</a>
+            <a class="btn btn-secondary" href="#writing">Related Notes</a>
+          </div>
+        </article>
+
         <div class="projects-grid">
           <article class="project-card">
-            <div class="project-meta">SEIM System / CyberSecurity</div>
-            <h3>Building a SIEM-Based Incident Response Lab with Splunk, Snort, Kali Linux, and Windows Server</h3>
-            <p>A hands-on cybersecurity lab showing how I configured Splunk, Snort, and Kali Linux to simulate attacks, validate detections, and build a practical incident response workflow.</p>
-            <a class="card-link" href="https://medium.com/@lagane100/building-a-siem-based-incident-response-lab-with-splunk-snort-kali-linux-and-windows-server-720a20f44620">View project</a>
+            <div class="project-meta">Cybersecurity · SIEM · Incident Response</div>
+            <h3>SIEM-Based Incident Response Lab</h3>
+            <p>A hands-on lab using Splunk, Snort, Kali Linux, and Windows Server to simulate attacks, validate detections, and document an investigation workflow.</p>
+            <div class="card-tags">
+              <span class="tag">Splunk</span>
+              <span class="tag">Snort</span>
+              <span class="tag">Windows Server</span>
+            </div>
+            <a class="card-link" href="https://medium.com/@lagane100/building-a-siem-based-incident-response-lab-with-splunk-snort-kali-linux-and-windows-server-720a20f44620">Read writeup →</a>
           </article>
 
           <article class="project-card">
-            <!-- <div class="project-meta">Web / Automation</div>
-            <h3>Jira and Confluence Workflow Tooling</h3>
-            <p>Worked on data extraction, field handling, and process improvements for project tracking and documentation flows.</p>
-            <a class="card-link" href="#">View project</a> -->
+            <div class="project-meta">Hack The Box · Web · Privilege Escalation</div>
+            <h3>HTB Writeups & Lab Notes</h3>
+            <p>Sanitized notes focused on attack-chain reasoning, troubleshooting, enumeration discipline, and clear technical communication.</p>
+            <div class="card-tags">
+              <span class="tag">Linux</span>
+              <span class="tag">Web Security</span>
+              <span class="tag">Documentation</span>
+            </div>
+            <a class="card-link" href="https://github.com/Bill-Lo-CA/HTB-writeups">View repository →</a>
           </article>
 
           <article class="project-card">
-            <!-- <div class="project-meta">Programming / Learning</div>
-            <h3>Technical Study Notes</h3>
-            <p>Collected writeups on networking, security concepts, programming exercises, and implementation experiments.</p>
-            <a class="card-link" href="#">View project</a> -->
+            <div class="project-meta">In Progress · Open Source · Workflow Design</div>
+            <h3>Open Source Contribution Recommender</h3>
+            <p>A planned tool to discover realistic GitHub contribution opportunities, score repos/issues, track PR status, and encourage responsible maintainer communication.</p>
+            <div class="card-tags">
+              <span class="tag">GitHub API</span>
+              <span class="tag">Recommendation</span>
+              <span class="tag">Product Thinking</span>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section id="security">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Cybersecurity / SOC Labs</h2>
+            <p>My security work is positioned around investigation, detection, triage, and communication.</p>
+          </div>
+        </div>
+
+        <div class="section-panel about-grid">
+          <div>
+            <p>
+              I am building a practical SOC analyst skill set through labs, cyber ranges, HTB machines, and incident-style documentation.
+              My focus is not only exploitation, but also understanding what happened, validating evidence, and explaining the investigation clearly.
+            </p>
+            <div class="stack-groups">
+              <div class="stack-group">
+                <h3 class="stack-title">Investigation skills</h3>
+                <div class="stack-list">
+                  <span class="tag">Alert Triage</span>
+                  <span class="tag">Log Analysis</span>
+                  <span class="tag">Incident Notes</span>
+                  <span class="tag">Detection Validation</span>
+                </div>
+              </div>
+              <div class="stack-group">
+                <h3 class="stack-title">Tools & environments</h3>
+                <div class="stack-list">
+                  <span class="tag">Splunk</span>
+                  <span class="tag">Snort</span>
+                  <span class="tag">Kali Linux</span>
+                  <span class="tag">Windows Server</span>
+                  <span class="tag">Microsoft 365 Security</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="highlights">
+            <div class="highlight-item">SIEM lab writeup with Splunk, Snort, Kali Linux, and Windows Server.</div>
+            <div class="highlight-item">LogN Cyber Range practice, including attack/defense and cloud compromise scenarios.</div>
+            <div class="highlight-item">HTB lab work presented as sanitized reasoning-focused notes.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="writing">
+      <div class="container">
+        <div class="section-head">
+          <div>
+            <h2>Writing & Technical Notes</h2>
+            <p>Writeups, study notes, and project documentation that show how I think through technical problems.</p>
+          </div>
+          <a class="section-link" href="https://medium.com/@lagane100">Medium →</a>
+        </div>
+
+        <div class="posts-grid">
+          <article class="post-card">
+            <div class="post-meta">Published · Cybersecurity Lab</div>
+            <h3>Building a SIEM-Based Incident Response Lab</h3>
+            <p>Hands-on setup and investigation notes for Splunk, Snort, Kali Linux, and Windows Server.</p>
+            <a class="card-link" href="https://medium.com/@lagane100/building-a-siem-based-incident-response-lab-with-splunk-snort-kali-linux-and-windows-server-720a20f44620">Read on Medium →</a>
+          </article>
+
+          <article class="post-card">
+            <div class="post-meta">In Progress · HTB / Security</div>
+            <h3>HTB Lab Writeups</h3>
+            <p>Notes focused on enumeration, root-cause reasoning, exploit-chain clarity, and safe public documentation.</p>
+            <a class="card-link" href="https://github.com/Bill-Lo-CA/HTB-writeups">View notes →</a>
+          </article>
+
+          <article class="post-card">
+            <div class="post-meta">Planned · Cloud Security</div>
+            <h3>M365 Compromise & Cloud Kill Chain</h3>
+            <p>A future investigation-style article based on cloud compromise practice, timeline reconstruction, and detection opportunities.</p>
           </article>
         </div>
       </div>
@@ -203,7 +266,7 @@
         <div class="contact-grid">
           <div class="contact-card">
             <h3>Email</h3>
-            <p>bill.lo.0528@gmail.com</p>
+            <a href="mailto:bill.lo.0528@gmail.com">bill.lo.0528@gmail.com</a>
           </div>
           <div class="contact-card">
             <h3>GitHub</h3>
@@ -218,8 +281,8 @@
             <a href="https://medium.com/@lagane100">medium.com/@lagane100</a>
           </div>
           <div class="contact-card">
-            <h3>HackTheBox</h3>
-            <a href="https://app.hackthebox.com/public/users/3095335">hackthebox.com/profile/laganeca</a>
+            <h3>Hack The Box</h3>
+            <a href="https://app.hackthebox.com/public/users/3095335">HTB public profile</a>
           </div>
           <div class="contact-card">
             <h3>Location</h3>
@@ -234,9 +297,10 @@
     <div class="container footer-panel">
       <div>© 2026 Bill Lo. Built for GitHub Pages.</div>
       <div class="footer-links">
-        <a href="#about">About</a>
-        <a href="#posts">Posts</a>
+        <a href="#focus">Focus</a>
         <a href="#projects">Projects</a>
+        <a href="#security">Security</a>
+        <a href="#writing">Writing</a>
       </div>
     </div>
   </footer>
