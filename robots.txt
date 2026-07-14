@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://bill-lo-ca.github.io/sitemap.xml
