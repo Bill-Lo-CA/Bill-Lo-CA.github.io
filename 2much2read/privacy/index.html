@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Privacy Policy · 2Much2Read</title>
+  <meta name="description" content="Privacy Policy for 2Much2Read.">
+  <style>
+    :root{color-scheme:light dark;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+    body{max-width:760px;margin:0 auto;padding:48px 24px;line-height:1.7}
+    h1{font-size:2.2rem}h2{margin-top:2rem}a{color:inherit}.muted{opacity:.72}
+  </style>
+</head>
+<body>
+  <main>
+    <p><a href="../">← 2Much2Read</a></p>
+    <h1>Privacy Policy</h1>
+    <p class="muted">Effective date: September 18, 2026</p>
+
+    <p>2Much2Read is a personal, local-first automation application. It is used by its owner to process selected Gmail newsletters, synchronize Google Calendar information for reminders, and send resulting digests or reminders to a private Discord destination.</p>
+
+    <h2>Google user data accessed</h2>
+    <p>The application may access Gmail data needed to identify and process configured newsletter messages and Google Calendar data needed to read configured calendars and events. Access is limited to functionality explicitly configured by the user.</p>
+
+    <h2>How Google user data is used</h2>
+    <p>Gmail content is used to extract and rank newsletter items for a personal digest. Google Calendar data is used to create local agenda and reminder jobs. Google user data is not used for advertising, profiling, or sale.</p>
+
+    <h2>Storage and processing</h2>
+    <p>OAuth credentials, tokens, configuration, and application databases are stored on the user's own machine. Gmail message bodies are processed for the requested workflow but are not persisted by the application; only limited processing metadata such as hashes and lengths may be retained. Calendar-derived reminder state and digest-related application state may be stored locally in SQLite.</p>
+    <p>AI processing is local by default through Ollama. If the user explicitly enables a remote Ollama endpoint, email or article content submitted for that processing may leave the local machine and is then subject to the privacy practices of the configured remote service.</p>
+
+    <h2>Disclosure to third parties</h2>
+    <p>The application sends only the final configured digest, reminder, agenda, or notification output to the user's configured private Discord destination. Those messages are handled by Discord under Discord's own terms and privacy practices. Google user data is not sold.</p>
+
+    <h2>Data retention and deletion</h2>
+    <p>Runtime data remains on the user's own machine until the user deletes it. The user can remove locally stored OAuth tokens, configuration, and SQLite databases at any time, and can revoke the application's Google access from their Google Account. Discord messages may be deleted through the user's Discord account or server controls.</p>
+
+    <h2>Security</h2>
+    <p>The application is designed to keep secrets and runtime data outside the public source repository and to restrict local credential and data files with operating-system permissions. No security measure can guarantee absolute protection.</p>
+
+    <h2>Contact</h2>
+    <p>Questions about this policy can be raised through the project's public GitHub repository: <a href="https://github.com/Bill-Lo-CA/2Much2Read">Bill-Lo-CA/2Much2Read</a>.</p>
+  </main>
+</body>
+</html>
