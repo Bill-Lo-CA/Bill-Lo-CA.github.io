@@ -5,7 +5,7 @@ on:
     branches:
       - main
     paths:
-      - "CyberSecurity/**/*.md"
+      - "CyberSecurity/*/*/*.md"
       - ".github/workflows/verify-cybersecurity-daily.yml"
   schedule:
     # 19:15 UTC = 15:15 EDT / 14:15 EST.
