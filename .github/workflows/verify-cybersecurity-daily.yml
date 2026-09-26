@@ -1,0 +1,162 @@
+name: Verify daily cybersecurity study
+
+on:
+  schedule:
+    # 19:15 UTC = 15:15 EDT / 14:15 EST.
+    # This stays safely after the 13:00 America/Toronto ChatGPT schedule year-round.
+    - cron: "15 19 * * *"
+  workflow_dispatch:
+    inputs:
+      date:
+        description: "Optional date to validate (YYYY-MM-DD). Leave blank for today in America/Toronto."
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Verify daily Markdown
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Resolve target file
+        id: target
+        shell: bash
+        env:
+          MANUAL_DATE: ${{ inputs.date }}
+        run: |
+          set -euo pipefail
+
+          if [[ -n "${MANUAL_DATE:-}" ]]; then
+            if [[ ! "$MANUAL_DATE" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}$ ]]; then
+              echo "::error::workflow_dispatch date must use YYYY-MM-DD"
+              exit 1
+            fi
+            TARGET_DATE="$MANUAL_DATE"
+          else
+            TARGET_DATE="$(TZ=America/Toronto date +%F)"
+          fi
+
+          YEAR="${TARGET_DATE:0:4}"
+          MONTH="${TARGET_DATE:5:2}"
+          DAY="${TARGET_DATE:8:2}"
+          FILE="CyberSecurity/$YEAR/$MONTH/$DAY.md"
+
+          echo "date=$TARGET_DATE" >> "$GITHUB_OUTPUT"
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+
+          echo "Target date: $TARGET_DATE"
+          echo "Target file: $FILE"
+
+      - name: Verify file exists and is substantial
+        shell: bash
+        env:
+          FILE: ${{ steps.target.outputs.file }}
+        run: |
+          set -euo pipefail
+
+          if [[ ! -f "$FILE" ]]; then
+            echo "::error file=$FILE::Daily cybersecurity Markdown is missing."
+            exit 1
+          fi
+
+          BYTES="$(wc -c < "$FILE")"
+          LINES="$(wc -l < "$FILE")"
+
+          echo "Size: $BYTES bytes"
+          echo "Lines: $LINES"
+
+          # Past complete entries are much larger; 5 KB is only a guard against empty/partial writes.
+          if (( BYTES < 5000 )); then
+            echo "::error file=$FILE::File is unexpectedly small ($BYTES bytes); likely incomplete."
+            exit 1
+          fi
+
+      - name: Verify four-section structure
+        shell: bash
+        env:
+          FILE: ${{ steps.target.outputs.file }}
+        run: |
+          set -euo pipefail
+
+          require() {
+            local needle="$1"
+            local description="$2"
+            if ! grep -Fq "$needle" "$FILE"; then
+              echo "::error file=$FILE::Missing $description: $needle"
+              exit 1
+            fi
+          }
+
+          require "## 1/4｜每日資安小知識" "daily cybersecurity section"
+          require "## 2/4｜CySA" "CySA section 2/4"
+          require "## 3/4｜CySA" "CySA section 3/4"
+          require "## 4/4｜CySA" "CySA section 4/4"
+          require "### 今天應該記住" "daily takeaways"
+
+      - name: Verify CySA question structure
+        shell: bash
+        env:
+          FILE: ${{ steps.target.outputs.file }}
+        run: |
+          set -euo pipefail
+
+          count_fixed() {
+            grep -Fc "$1" "$FILE" || true
+          }
+
+          ENGLISH_COUNT="$(count_fixed "### English original")"
+          CHINESE_COUNT="$(count_fixed "### 中文完整翻譯")"
+          ANSWER_SECTION_COUNT="$(count_fixed "### 答案與解析")"
+          CORRECT_ANSWER_COUNT="$(count_fixed "**正確答案：")"
+
+          echo "English question blocks: $ENGLISH_COUNT"
+          echo "Chinese translation blocks: $CHINESE_COUNT"
+          echo "Answer sections: $ANSWER_SECTION_COUNT"
+          echo "Correct-answer markers: $CORRECT_ANSWER_COUNT"
+
+          if [[ "$ENGLISH_COUNT" -ne 3 ]]; then
+            echo "::error file=$FILE::Expected exactly 3 English-original CySA blocks, found $ENGLISH_COUNT."
+            exit 1
+          fi
+
+          if [[ "$CHINESE_COUNT" -ne 3 ]]; then
+            echo "::error file=$FILE::Expected exactly 3 Chinese-translation CySA blocks, found $CHINESE_COUNT."
+            exit 1
+          fi
+
+          if [[ "$ANSWER_SECTION_COUNT" -ne 3 ]]; then
+            echo "::error file=$FILE::Expected exactly 3 answer/explanation sections, found $ANSWER_SECTION_COUNT."
+            exit 1
+          fi
+
+          if [[ "$CORRECT_ANSWER_COUNT" -ne 3 ]]; then
+            echo "::error file=$FILE::Expected exactly 3 correct-answer markers, found $CORRECT_ANSWER_COUNT."
+            exit 1
+          fi
+
+      - name: Publish verification summary
+        if: always()
+        shell: bash
+        env:
+          TARGET_DATE: ${{ steps.target.outputs.date }}
+          FILE: ${{ steps.target.outputs.file }}
+        run: |
+          {
+            echo "## Daily cybersecurity verification"
+            echo
+            echo "- Date: `$TARGET_DATE`"
+            echo "- File: `$FILE`"
+            if [[ -f "$FILE" ]]; then
+              echo "- Size: `$(wc -c < "$FILE") bytes`"
+              echo "- Result: file found; see job status for structural validation."
+            else
+              echo "- Result: file missing."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
