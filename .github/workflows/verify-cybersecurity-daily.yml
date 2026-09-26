@@ -1,6 +1,12 @@
 name: Verify daily cybersecurity study
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - "CyberSecurity/**/*.md"
+      - ".github/workflows/verify-cybersecurity-daily.yml"
   schedule:
     # 19:15 UTC = 15:15 EDT / 14:15 EST.
     # This stays safely after the 13:00 America/Toronto ChatGPT schedule year-round.
@@ -72,7 +78,8 @@ jobs:
           echo "Size: $BYTES bytes"
           echo "Lines: $LINES"
 
-          # Past complete entries are much larger; 5 KB is only a guard against empty/partial writes.
+          # Complete daily entries are expected to be substantially larger.
+          # 5 KB is only a guard against empty or clearly partial writes.
           if (( BYTES < 5000 )); then
             echo "::error file=$FILE::File is unexpectedly small ($BYTES bytes); likely incomplete."
             exit 1
