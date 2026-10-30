@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="A solo digital forensics investigation of DFIR Madness Case 001: an RDP brute force, malware persistence, lateral movement and data theft reconstructed from disk images, event logs, registry hives and a packet capture." />
+  <meta name="author" content="Bill Lo" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#020604" />
+  <link rel="canonical" href="https://bill-lo-ca.github.io/writeups/szechuan-sauce/" />
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../../style.css" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://bill-lo-ca.github.io/writeups/szechuan-sauce/" />
+  <meta property="og:title" content="Reconstructing a Windows Data Breach: The Case of the Stolen Szechuan Sauce" />
+  <meta property="og:description" content="A solo DFIR investigation reconstructing an RDP intrusion, malware persistence, lateral movement and data theft across two Windows machines." />
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/143205609?v=4" />
+  <meta property="article:published_time" content="2026-10-30" />
+  <meta property="article:author" content="Bill Lo" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Reconstructing a Windows Data Breach: The Case of the Stolen Szechuan Sauce" />
+  <meta name="twitter:description" content="A solo DFIR investigation reconstructing an RDP intrusion, malware persistence, lateral movement and data theft across two Windows machines." />
+  <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/143205609?v=4" />
+
+  <title>Reconstructing a Windows Data Breach: The Case of the Stolen Szechuan Sauce | Bill Lo</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "Reconstructing a Windows Data Breach: The Case of the Stolen Szechuan Sauce",
+    "description": "A solo digital forensics investigation of DFIR Madness Case 001.",
+    "datePublished": "2026-10-30",
+    "author": {
+      "@type": "Person",
+      "name": "Bill Lo",
+      "url": "https://bill-lo-ca.github.io/"
+    },
+    "mainEntityOfPage": "https://bill-lo-ca.github.io/writeups/szechuan-sauce/"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header>
+    <div class="container nav">
+      <a class="brand" href="../../" aria-label="Back to portfolio home">
+        <span class="brand-mark">BL</span>
+        <span>Bill Lo</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-links">
+          <li><a href="../../#projects">Projects</a></li>
+          <li><a href="../../#security">Security</a></li>
+          <li><a href="../../#skills">Skills</a></li>
+          <li><a href="../../#writing">Writing</a></li>
+          <li><a href="../../#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="article-section">
+      <div class="container">
+        <article class="article panel">
+          <div class="terminal-bar">terminal://bill-lo-ca/writeups/szechuan-sauce</div>
+
+          <div class="article-body">
+            <div class="article-header">
+              <div class="post-meta">Writeup · Digital Forensics · Incident Response</div>
+              <h1>Reconstructing a Windows Data Breach: The Case of the Stolen Szechuan Sauce</h1>
+              <p class="article-dek">
+                A solo digital forensics investigation of DFIR Madness Case 001: how disk images, event logs, registry hives and a packet capture piece together an RDP intrusion, malware persistence, lateral movement and data theft across two Windows machines.
+              </p>
+              <div class="article-byline">By Bill Lo · <time datetime="2026-10-30">October 30, 2026</time></div>
+            </div>
+
+            <p>
+              A secret Szechuan sauce recipe has turned up on the dark web. The victim’s network is two Windows machines, a domain controller and a desktop. The job is to find out whether there was a breach, how the attacker got in, what they did and what they took.
+            </p>
+            <p>
+              This is The Case of the Stolen Szechuan Sauce, a free forensics challenge created by James Smith of DFIR Madness. I investigated it on my own as the final project for CST8806 Digital Forensics at Algonquin College. This article walks through what I found and how I found it.
+            </p>
+
+            <h2 id="the-case-and-the-evidence">The case and the evidence</h2>
+            <p>The victim network had two hosts on the 10.42.85.0/24 subnet:</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th scope="col">System</th><th scope="col">IP address</th><th scope="col">Operating system</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>DC01 (server)</td><td>10.42.85.10</td><td>Windows Server 2012 R2 Standard</td></tr>
+                  <tr><td>DESKTOP-SDN1RPT</td><td>10.42.85.115</td><td>Windows 10 Enterprise Evaluation</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              I identified the server’s OS from <code>license.rtf</code> under <code>Windows\System32\Licenses</code> in FTK Imager, and the desktop’s from the SOFTWARE hive (<code>Microsoft\Windows NT\CurrentVersion</code>) in Registry Explorer.
+            </p>
+            <p>
+              The evidence arrived as one archive, Project Images.7z, with published MD5 and SHA1 values. Inside were eleven more archives, each with its own MD5:
+            </p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th scope="col">Source</th><th scope="col">Evidence</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Network</td><td>Packet capture (PCAP)</td></tr>
+                  <tr><td>DC01</td><td>Disk image (E01), memory dump, pagefile, protected files, Autoruns output</td></tr>
+                  <tr><td>DESKTOP-SDN1RPT</td><td>Disk image (E01), memory dump, pagefile, protected files, Autoruns output</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              Before any analysis, I hashed everything in PowerShell and compared the results with the supplied values. Every hash matched, so the files I examined were the files that were collected.
+            </p>
+            <!-- Figure 1: PowerShell hash check of all evidence files against the supplied MD5 values. Report: Data Preparation, Sig. 3. -->
+            <p>
+              I could not get Magnet AXIOM running, so I built the investigation on free tools: FTK Imager and Autopsy for the disk images, Wireshark for the network capture, and Eric Zimmerman’s Registry Explorer, EvtxECmd, MFTECmd and Timeline Explorer for registry, event log and file system artifacts.
+            </p>
+
+            <h2 id="a-one-hour-gap">A one-hour gap between sources</h2>
+            <p>
+              The first thing to sort out was time. The server’s SYSTEM hive (<code>ControlSet001\Control\TimeZoneInformation</code>) shows it set to Pacific Standard Time. Yet the host artifacts and the PCAP disagreed by exactly one hour. The malware’s $MFT creation time, for example, sat one hour after the moment the PCAP shows it being downloaded.
+            </p>
+            <p>
+              The cause is a misconfigured host, as the case author <a href="https://dfirmadness.com/case-001-the-timing-of-it-all/" target="_blank" rel="noopener noreferrer">explains</a>. The victim is in Colorado, on Mountain time (UTC−6 in September), but the hosts were set to Pacific time (UTC−7) while their clocks showed the correct local time. Every timestamp recorded on the hosts is therefore one hour later than reality, while the network capture is correct.
+            </p>
+            <p>
+              In practice, searching the host logs at the times seen in the PCAP turns up nothing. All times in this article are UTC, aligned to the PCAP, with host times shifted back one hour.
+            </p>
+            <!-- Figure 2: Registry Explorer showing the server's time zone set to Pacific Standard Time. Report: Analyze Questions, Sig. 3. -->
+
+            <h2 id="preparing-the-artifacts">Preparing the artifacts</h2>
+            <p>
+              Raw disk images are hard to read directly, so I pulled out the artifacts that record activity and converted them into searchable timelines:
+            </p>
+            <ul>
+              <li><strong>File system activity.</strong> In Autopsy, I exported the NTFS change journal (<code>$Extend\$UsnJrnl:$J</code>) and the <code>$MFT</code> from each image, then parsed them with MFTECmd into CSV files for Timeline Explorer. The journal shows when files were created, renamed, modified and deleted.</li>
+              <li><strong>Registry.</strong> From <code>Windows\System32\config</code> in FTK Imager, I exported the SYSTEM and SOFTWARE hives and opened them in Registry Explorer for OS, network and service configuration.</li>
+              <li><strong>Event logs.</strong> From <code>Windows\System32\winevt\Logs</code>, I exported each host’s <code>Security.evtx</code>, converted it to CSV with EvtxECmd, and loaded it into Timeline Explorer.</li>
+              <li><strong>Network.</strong> The PCAP went into Wireshark to follow RDP sessions, HTTP downloads and internal connections.</li>
+            </ul>
+
+            <h2 id="how-the-attacker-got-in">How the attacker got in</h2>
+            <p>The way in was an RDP brute force against the domain controller, and the PCAP shows it plainly.</p>
+            <p>
+              At 02:19, 194.61.24.102 scanned TCP port 3389 (RDP) on DC01 with Nmap. At 02:21 it began brute-forcing the RDP login, and within the same minute it logged in successfully as Administrator. A domain controller with RDP reachable from the internet had its administrator password guessed.
+            </p>
+            <!-- Figure 3: Wireshark showing the successful Administrator login after the RDP brute force. Report: Analyze Questions, Sig. 4. -->
+
+            <h2 id="the-malware">The malware: coreupdater.exe</h2>
+            <p>
+              Once inside, the attacker installed a Metasploit payload named coreupdater.exe on the server, and later on the desktop, and made it persistent as a Windows service.
+            </p>
+
+            <h3>Delivery and identification</h3>
+            <p>
+              At 02:24:06, Internet Explorer inside the attacker’s RDP session downloaded coreupdater.exe over HTTP from 194.61.24.102, the same address behind the brute force. The PCAP shows the same file sent to the desktop later.
+            </p>
+            <p>
+              Wireshark can rebuild files from HTTP traffic (File → Export Objects → HTTP), so I exported the executable and hashed it. The same hash also appears in the Autoruns output. VirusTotal flags it as malicious, lists its behaviour as mostly dropping files and network communication, and ties it to Metasploit. In other words, it is free and easy to obtain.
+            </p>
+            <p>VirusTotal also places 194.61.24.102 in Russia. That describes the address, not necessarily the person using it.</p>
+            <!-- Figure 4: coreupdater.exe sent from 194.61.24.102 to both hosts. Report: Analyze Questions, Sig. 5. -->
+            <!-- Figure 5: VirusTotal results for the coreupdater.exe hash. Report: Analyze Questions, Sig. 8. -->
+
+            <h3>Where it lives and how it got there</h3>
+            <p>
+              Timeline Explorer places the file at <code>C:\Windows\System32\coreupdater.exe</code>, which I confirmed in both FTK Imager and Autopsy. Its $MFT creation time matches the download in the PCAP once the one-hour offset is removed.
+            </p>
+            <p>
+              A file downloaded through a browser lands in the user’s Downloads folder by default, not in System32. The change journal explains the difference: it records the file being deleted and created at the same instant, the typical trace of a move. The attacker moved the payload into a system folder where it would look routine.
+            </p>
+            <!-- Figure 6: Timeline Explorer locating coreupdater.exe in System32. Report: Analyze Questions, Sig. 12. -->
+            <!-- Figure 7: $UsnJrnl delete-and-create records showing the move. Report: Analyze Questions, Sig. 16. -->
+
+            <h3>Persistence</h3>
+            <p>
+              The change journal shows the payload moved and executed at 02:24:12 on DC01 and at 02:40:00 on the desktop. In the SYSTEM hive, Registry Explorer shows it registered as a Windows service, installed at 02:27:49 to start automatically with LocalSystem privileges. Both machines carry the same file in System32.
+            </p>
+            <!-- Figure 8: Registry Explorer showing coreupdater running as a service. Report: Analyze Questions, Sig. 21. -->
+
+            <h3>Calling home</h3>
+            <p>
+              VirusTotal links the hash to 56 IP addresses. Only one, 203.78.103.109, had any detections (7 of 94 engines). That same address appears in the PCAP right after coreupdater.exe started on DC01, which makes it the most likely command-and-control server.
+            </p>
+            <!-- Figure 9: Traffic to 203.78.103.109 right after the payload ran. Report: Analyze Questions, Sig. 11. -->
+
+            <h2 id="moving-to-the-desktop">Moving to the desktop</h2>
+            <p>At about 02:35, the attacker used the server as a stepping stone to reach the desktop over RDP.</p>
+            <p>
+              The PCAP shows an RDP connection from DC01 (10.42.85.10) to the desktop (10.42.85.115). The desktop’s Security log records a matching successful logon (event 4624) coming from DC01. The same pair of addresses gives the network layout: two hosts in 10.42.85.0/24, which Autopsy confirms under <code>ControlSet001\Services\Tcpip\Parameters\Interfaces</code> in each machine’s SYSTEM hive.
+            </p>
+            <p>
+              On the desktop, the attacker repeated the playbook. At 02:40, Internet Explorer downloaded coreupdater.exe from 194.61.24.102 again, and around 02:41 it was installed the same way as on the server.
+            </p>
+            <!-- Figure 10: RDP connection from DC01 to the desktop in the PCAP. Report: Analyze Questions, Sig. 24. -->
+            <!-- Figure 11: Logon event on the desktop with DC01 as the source. Report: Analyze Questions, Sig. 25. -->
+
+            <h2 id="what-was-taken">What was taken</h2>
+            <p>
+              The attacker collected the contents of the server’s Secret share, including the Szechuan sauce recipe, zipped them and sent them out, then did the same on the desktop.
+            </p>
+            <p>
+              On the server, the change journal shows every file under <code>FileShare\Secret</code> being opened and closed during the breach. Around 02:30, an archive named secret.zip, matching the folder’s name, was created. Around 02:31 it was sent out over the Meterpreter session and deleted. Szechuan Sauce.txt shows access at 02:32:21.
+            </p>
+            <p>
+              Because the archive was deleted, I cannot list exactly what it contained. But every file in the share was opened, an archive named after the folder appeared and vanished within minutes, and the recipe later surfaced on the dark web. I concluded the recipe was stolen in this window, roughly 02:30 to 02:33.
+            </p>
+            <p>On the desktop, the same thing happened with a different name: loot.zip was created around 02:46, then sent out and deleted around 02:48.</p>
+            <!-- Figure 12: Files in the Secret share opened during the breach. Report: Analyze Questions, Sig. 26. -->
+            <!-- Figure 13: secret.zip created and deleted shortly afterwards. Report: Analyze Questions, Sig. 27. -->
+
+            <h3>Who had logged on</h3>
+            <p>
+              The protected-files extracts show which accounts had logged on to each machine. On DC01, only Administrator. On the desktop, Admin, Administrator, mortysmith and ricksanchez.
+            </p>
+
+            <h2 id="covering-tracks">Covering tracks</h2>
+            <p>The attacker also tampered with the share: one file was swapped for a fake, and the fake was given false timestamps.</p>
+
+            <h3>A swapped secret</h3>
+            <p>
+              At 02:34, SECRET_beth.txt was deleted from the Secret share and a new file, Beth_Secret.txt, appeared with different content. The original was not gone. Autopsy’s Recycle Bin artifact lists a recycled file, $RU2L112.txt, whose metadata still records its original name, SECRET_beth.txt. Its content: “Earth beth is the real beth.”
+            </p>
+            <!-- Figure 14: Recycle Bin entry preserving the original name SECRET_beth.txt. Report: Analyze Questions, Sig. 34. -->
+            <!-- Figure 15: Recovered content of SECRET_beth.txt. Report: Analyze Questions, Sig. 35. -->
+
+            <h3>A timestomped file</h3>
+            <p>
+              Around 02:38, the timestamps of Beth_Secret.txt were changed to match PortalGunsPlans.txt in the same folder, so a directory listing makes the fake look as old as the real files. Two artifacts gave it away. Timeline Explorer shows a BasicInfoChange as the file’s last journal entry, and in the $MFT its last-modified and last-record-change times no longer line up the way they should.
+            </p>
+            <p>Timestomping rewrites some timestamps, but the record of the rewrite stays behind.</p>
+            <!-- Figure 16: BasicInfoChange on Beth_Secret.txt in Timeline Explorer. Report: Analyze Questions, Sig. 36. -->
+            <!-- Figure 17: $MFT timestamps for Beth_Secret.txt that no longer match. Report: Analyze Questions, Sig. 37. -->
+
+            <h2 id="attack-timeline">Attack timeline</h2>
+            <p>The whole intrusion took under half an hour on 19 September 2020. Times are UTC; a tilde (~) marks approximate times.</p>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr><th scope="col">Time (UTC)</th><th scope="col">Host</th><th scope="col">Event</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>02:19</td><td>DC01</td><td>Nmap scan of TCP 3389 from 194.61.24.102</td></tr>
+                  <tr><td>02:21</td><td>DC01</td><td>RDP brute force begins</td></tr>
+                  <tr><td>02:21</td><td>DC01</td><td>Successful Administrator login over RDP from 194.61.24.102</td></tr>
+                  <tr><td>02:24:06</td><td>DC01</td><td>coreupdater.exe downloaded with Internet Explorer from 194.61.24.102</td></tr>
+                  <tr><td>02:27:49</td><td>DC01</td><td>coreupdater.exe installed as an autostart service with LocalSystem privileges</td></tr>
+                  <tr><td>~02:30</td><td>DC01</td><td>Secret share files zipped into secret.zip</td></tr>
+                  <tr><td>~02:31</td><td>DC01</td><td>secret.zip sent out over Meterpreter, then deleted</td></tr>
+                  <tr><td>02:32:21</td><td>DC01</td><td>Szechuan Sauce.txt accessed</td></tr>
+                  <tr><td>02:34</td><td>DC01</td><td>SECRET_beth.txt deleted; Beth_Secret.txt created with different content</td></tr>
+                  <tr><td>02:35</td><td>DC01 → desktop</td><td>RDP connection from the server to the desktop</td></tr>
+                  <tr><td>~02:38</td><td>DC01</td><td>Beth_Secret.txt timestomped to match PortalGunsPlans.txt</td></tr>
+                  <tr><td>02:40</td><td>Desktop</td><td>coreupdater.exe downloaded from 194.61.24.102</td></tr>
+                  <tr><td>~02:41</td><td>Desktop</td><td>coreupdater.exe installed</td></tr>
+                  <tr><td>~02:46</td><td>Desktop</td><td>Files zipped into loot.zip</td></tr>
+                  <tr><td>~02:48</td><td>Desktop</td><td>loot.zip sent out over Meterpreter, then deleted</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>The last attacker activity I found in the Security event log was a logoff at 02:47:40.</p>
+            <!-- Figure 18: The attacker's logoff in the Security log. Report: Analyze Questions, Sig. 31. -->
+
+            <h2 id="recommendations">Recommendations</h2>
+            <p>
+              This breach needed no exotic exploit: a domain controller with RDP open to the internet and a guessable administrator password were enough. My remediation report split the response into immediate actions and longer-term prevention.
+            </p>
+
+            <h3>Immediate remediation</h3>
+            <ol>
+              <li>Isolate DC01 and the desktop from the network to stop further movement.</li>
+              <li>Delete coreupdater.exe from System32 on both machines and stop its processes.</li>
+              <li>Reset all passwords, starting with Administrator, and add multifactor authentication to critical accounts.</li>
+              <li>Restore SECRET_beth.txt from the Recycle Bin and correct the timestomped file’s timestamps.</li>
+              <li>Document every step and notify stakeholders and authorities as compliance requires.</li>
+            </ol>
+
+            <h3>Preventing a repeat</h3>
+            <ul>
+              <li><strong>Restrict RDP.</strong> Disable external access, or put it behind a VPN and strict firewall rules, and require Network Level Authentication.</li>
+              <li><strong>Protect endpoints.</strong> Run real-time anti-malware and an endpoint detection and response (EDR) tool.</li>
+              <li><strong>Segment and monitor the network.</strong> Limit lateral movement between systems and watch traffic for anomalies.</li>
+              <li><strong>Fix the processes.</strong> Keep an incident response plan and drill it, train staff, enforce patch management, and apply least privilege with regular account audits and credential rotation.</li>
+              <li><strong>Think long term.</strong> Move toward a Zero Trust model, and align with CIS Control 12 (Network Infrastructure Management), CIS Control 13 (Network Monitoring and Defense) and SANS guidance on secure network device configuration.</li>
+            </ul>
+
+            <h2 id="conclusion">Conclusion</h2>
+            <p>
+              There was a breach, and the evidence traces it end to end: an RDP brute force against the domain controller, a Metasploit payload made persistent as a service, the Secret share zipped and sent out, a pivot to the desktop to do it again, and a swapped, timestomped file left behind.
+            </p>
+            <p>
+              No single source told the whole story. The PCAP showed the way in and the command-and-control traffic. The event logs tied sessions to machines. The change journal and $MFT exposed the payload’s move, the staging archives and the timestomp, and the registry explained the persistence and the time zone. Lining them up, after first making sure they agreed on the time, is what turned a pile of artifacts into a timeline.
+            </p>
+
+            <h2 id="references">References</h2>
+            <ul>
+              <li>Challenge: <a href="https://dfirmadness.com/the-stolen-szechuan-sauce/" target="_blank" rel="noopener noreferrer">Case 001 – The Stolen Szechuan Sauce</a>, DFIR Madness</li>
+              <li>Time zone explanation: <a href="https://dfirmadness.com/case-001-the-timing-of-it-all/" target="_blank" rel="noopener noreferrer">Case 001 – The Timing of it All</a>, DFIR Madness</li>
+              <li>Tools: <a href="https://ericzimmerman.github.io/" target="_blank" rel="noopener noreferrer">Eric Zimmerman’s forensic tools</a></li>
+            </ul>
+            <p class="article-note">
+              Thanks to James Smith of DFIR Madness for building and sharing the case. This analysis was completed for CST8806 Digital Forensics at Algonquin College.
+            </p>
+
+            <a class="card-link" href="../../#writing">← Back to writing</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-panel panel">
+      <div>© 2026 Bill Lo · Built as a static GitHub Pages portfolio.</div>
+      <div class="footer-links">
+        <a href="../../#projects">Projects</a>
+        <a href="../../#security">Security</a>
+        <a href="../../#skills">Skills</a>
+        <a href="../../#writing">Writing</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

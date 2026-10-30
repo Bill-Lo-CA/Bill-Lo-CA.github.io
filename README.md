@@ -19,6 +19,7 @@ The portfolio intentionally separates implemented work from planned experiments.
 
 - [ContextBubble](https://github.com/Bill-Lo-CA/contextbubble) — Chromium learning extension with caption-first ingestion, local ASR fallback, reviewed concept generation, and in-page overlays.
 - [SummerDay](https://github.com/Bill-Lo-CA/SummerDay) — local-first French lesson pipeline using SvelteKit, FastAPI, Stanza NLP, Ollama, and TTS review/publishing stages.
+- [Reconstructing a Windows Data Breach](https://bill-lo-ca.github.io/writeups/szechuan-sauce/) — solo DFIR investigation of DFIR Madness Case 001 (The Stolen Szechuan Sauce).
 - [SIEM Incident Response Lab](https://medium.com/@lagane100/building-a-siem-based-incident-response-lab-with-splunk-snort-kali-linux-and-windows-server-720a20f44620) — Splunk, Snort, Kali Linux, and Windows Server lab writeup.
 - [Hack The Box public profile](https://app.hackthebox.com/public/users/3095335) — ongoing hands-on security practice.
 
@@ -56,6 +57,7 @@ http://localhost:8000
 ├── favicon.svg     # Site icon
 ├── robots.txt      # Search crawler policy
 ├── sitemap.xml     # Canonical page listing
+├── writeups/       # Long-form investigation writeups (one folder per article)
 └── README.md       # Maintenance notes
 ```
 
