@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="2Much2Read: a local-first pipeline that turns selected Gmail newsletters into one de-duplicated daily digest using three local models, with the measurements behind each design decision and the security boundaries around it." />
+  <meta name="author" content="Bill Lo" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#020604" />
+  <link rel="canonical" href="https://bill-lo-ca.github.io/projects/2much2read/" />
+  <link rel="icon" href="../../favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="../../style.css" />
+
+  <meta property="og:type" content="article" />
+  <meta property="og:url" content="https://bill-lo-ca.github.io/projects/2much2read/" />
+  <meta property="og:title" content="2Much2Read: A Local-LLM Newsletter Digest" />
+  <meta property="og:description" content="Three local models, one 8 GB GPU, and one de-duplicated daily digest delivered to a private Discord channel." />
+  <meta property="og:image" content="https://avatars.githubusercontent.com/u/143205609?v=4" />
+  <meta property="article:published_time" content="2026-11-10" />
+  <meta property="article:author" content="Bill Lo" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="2Much2Read: A Local-LLM Newsletter Digest" />
+  <meta name="twitter:description" content="Three local models, one 8 GB GPU, and one de-duplicated daily digest delivered to a private Discord channel." />
+  <meta name="twitter:image" content="https://avatars.githubusercontent.com/u/143205609?v=4" />
+
+  <title>2Much2Read: A Local-LLM Newsletter Digest | Bill Lo</title>
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    "headline": "2Much2Read: A Local-LLM Newsletter Digest",
+    "description": "A local-first pipeline that turns selected Gmail newsletters into one de-duplicated daily digest using local models.",
+    "datePublished": "2026-11-10",
+    "author": {
+      "@type": "Person",
+      "name": "Bill Lo",
+      "url": "https://bill-lo-ca.github.io/"
+    },
+    "about": {
+      "@type": "SoftwareSourceCode",
+      "name": "2Much2Read",
+      "codeRepository": "https://github.com/Bill-Lo-CA/2Much2Read",
+      "programmingLanguage": "Python"
+    },
+    "mainEntityOfPage": "https://bill-lo-ca.github.io/projects/2much2read/"
+  }
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <header>
+    <div class="container nav">
+      <a class="brand" href="../../" aria-label="Back to portfolio home">
+        <span class="brand-mark">BL</span>
+        <span>Bill Lo</span>
+      </a>
+      <nav aria-label="Primary navigation">
+        <ul class="nav-links">
+          <li><a href="../../#projects">Projects</a></li>
+          <li><a href="../../#security">Security</a></li>
+          <li><a href="../../#skills">Skills</a></li>
+          <li><a href="../../#writing">Writing</a></li>
+          <li><a href="../../#contact">Contact</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main id="main-content">
+    <section class="article-section">
+      <div class="container">
+        <article class="article panel">
+          <div class="terminal-bar">terminal://bill-lo-ca/projects/2much2read</div>
+
+          <div class="article-body">
+            <div class="article-header">
+              <div class="post-meta">Project · Local LLM Pipeline · Hardened Automation</div>
+              <h1>2Much2Read: A Local-LLM Newsletter Digest</h1>
+              <p class="article-dek">
+                A local-first pipeline that reads selected Gmail newsletters, extracts and ranks their stories with three local models, folds duplicate coverage together, and posts one daily digest to a private Discord channel. This page covers how a run works, the measurements behind the main design decisions, and the security boundaries around it.
+              </p>
+              <div class="article-byline">By Bill Lo · <time datetime="2026-11-10">November 10, 2026</time> · <a href="https://github.com/Bill-Lo-CA/2Much2Read" target="_blank" rel="noopener noreferrer">Source on GitHub</a></div>
+            </div>
+
+            <p>
+              Technology and security newsletters overlap heavily. The same model release or CVE arrives from several senders on the same morning, each issue mixes in sponsored entries, and links arrive wrapped in click trackers that identify the subscriber. The few stories worth reading are buried under the rest.
+            </p>
+            <p>
+              2Much2Read reads only the newsletters configured for it, does all of its language-model work on the local machine by default, and sends nothing but the finished digest to Discord. It runs every morning on a systemd timer. The same repository holds three companion tools that share its runtime helpers, described at the end of this page.
+            </p>
+
+            <h2 id="at-a-glance">At a glance</h2>
+            <div class="table-wrap wrap-labels">
+              <table>
+                <thead>
+                  <tr><th scope="col">Area</th><th scope="col">Implementation</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Input</td><td>Gmail newsletters listed in <code>sources.yaml</code>, read through the Gmail API with a dedicated OAuth client; optional Hacker News feeds</td></tr>
+                  <tr><td>Extraction</td><td><code>llama3.2:3b</code> on Ollama, with <code>translategemma:4b</code> for titles outside the digest language</td></tr>
+                  <tr><td>Ranking</td><td><code>Qwen3-Reranker-0.6B</code> through sentence-transformers, on the CPU by default</td></tr>
+                  <tr><td>Review</td><td><code>qwen3:8b</code> on Ollama for final selection, duplicate judgement and headline rewrites</td></tr>
+                  <tr><td>State</td><td>SQLite, including an append-only <code>reranker_scores</code> audit table; Gmail labels mark processed and failed mail</td></tr>
+                  <tr><td>Delivery</td><td>Discord webhook, bot, or both, checkpointed per message chunk and per destination</td></tr>
+                  <tr><td>Runtime</td><td>Sandboxed systemd user timers; private files at mode <code>0600</code> in <code>0700</code> directories</td></tr>
+                  <tr><td>Quality</td><td>ruff, strict mypy, 1,100+ tests, CI on Python 3.11 and 3.13, weekly mutation testing</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h2 id="how-a-run-works">How a run works</h2>
+            <div class="flow" aria-label="2Much2Read digest pipeline">
+              <span>Gmail / Hacker News</span><b>→</b><span>Extract</span><b>→</b><span>Rerank</span><b>→</b><span>Review</span><b>→</b><span>Merge &amp; Rewrite</span><b>→</b><span>Discord</span>
+            </div>
+            <ol>
+              <li><strong>Prepare each email.</strong> Every URL in the text is replaced by a short candidate code such as <code>[L7]</code>, and unsubscribe or non-candidate links are removed. The extractor never needs a URL, and they were most of the tokens: this cut one issue of The New Stack from 21,354 tokens to 2,707.</li>
+              <li><strong>Extract stories.</strong> The small model first lists the issue’s stories and marks the sponsored ones, then writes an item for each. Counting first instead of capping at ten raised coverage over 12 TLDR issues from 91 of 165 stories to 147.</li>
+              <li><strong>Translate and check titles.</strong> A translation model brings titles into the digest language. Each title is then read back into English without the original in view and compared with the newsletter’s own headline, which catches mistranslations such as “distillation” coming back as “diffusion”.</li>
+              <li><strong>Rerank.</strong> The reranker scores up to 100 candidates. Seven of the twenty reviewer slots are reserved for security stories, because on a single scale AI releases outrank vulnerability disclosures: in one run only 3 of 23 security items reached the global top 20.</li>
+              <li><strong>Review.</strong> The review model picks the headlines. If none of them is a security story and no CVE is among the mentions, the best security story takes the last headline slot.</li>
+              <li><strong>Merge and rewrite.</strong> Coverage of the same story from several newsletters is folded into one entry, stories that repeat from the previous three days are marked, and each headline is rewritten from its full article rather than the few lines the extractor saw.</li>
+              <li><strong>Deliver.</strong> The digest goes to Discord. Each confirmed chunk is checkpointed, so a retry sends only what has not arrived.</li>
+            </ol>
+
+            <h2 id="one-gpu">Three models on one 8 GB GPU</h2>
+            <p>
+              The extractor, reranker and reviewer never share memory. The extractor and translator are released before the reranker loads, and the reranker is released before the reviewer starts. The reranker runs on the CPU unless the GPU has room to spare. Even alone, <code>qwen3:8b</code> at a 16,384-token context needs roughly 8 GB for its weights plus the KV cache, so the project documents running Ollama with a quantized KV cache and checking the real footprint with <code>ollama ps</code> rather than trusting the setting.
+            </p>
+            <p>
+              Context limits turned out to be a correctness and security issue, not only a performance one. Ollama truncates an oversized prompt from the head without raising an error, which silently drops the system prompt while keeping the untrusted newsletter text. Every prompt is therefore bounded against the context window before it is sent: candidates and newsletter text are trimmed from the tail, and the prompt-injection guard is repeated after the untrusted block.
+            </p>
+
+            <h2 id="duplicate-judgement">Decision: asking the model instead of counting words</h2>
+            <p>
+              Deciding whether two entries describe the same story was first done by token overlap. Six successive review rounds each found a new class of pair it got wrong: common lowercase words, bare acronyms, Title Case headlines, and titles the extractor never translated. Over 476 real items, 17 unrelated pairs still merged, such as two different stories that both named Claude Code. The question is semantic and the method was lexical, so each fix only exposed the next case.
+            </p>
+            <p>
+              Token overlap now only decides which pairs are worth asking about. A pair that shares a distinctive token is shortlisted, and the review model answers one yes-or-no question for it. A loose shortlist costs a generation rather than a wrong digest. On real runs it shortlists 0 to 15 pairs per digest, typically 2 to 5, and a budget caps a pathological run. When the budget runs out or the model fails, the answer is no, because a missed merge only loses an attribution while a wrong merge gives one headline another story’s article.
+            </p>
+            <p>
+              A yes-or-no answer was chosen over a 0–100 score after measuring both:
+            </p>
+            <div class="table-wrap wrap-labels">
+              <table>
+                <thead>
+                  <tr><th scope="col">Measurement</th><th scope="col">Result (0–100 score unless noted)</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>Distinct pairs</td><td>0, 0, 0, 0, 0, 0, 20, 30</td></tr>
+                  <tr><td>True duplicates</td><td>50, 85, 95, 95, 100, 100</td></tr>
+                  <tr><td>Threshold gap</td><td>20 points</td></tr>
+                  <tr><td>Order swapped</td><td>Moved a score by up to 35 points; never flipped the yes-or-no answer</td></tr>
+                  <tr><td>Yes/no accuracy</td><td>9 of 10 known pairs; the one miss declined to merge, the safe direction</td></tr>
+                </tbody>
+              </table>
+            </div>
+            <p>
+              The gap a threshold would sit in was narrower than the noise from presentation order alone, so whether two entries merged would have depended on which one happened to be the headline. A discrete judgement is what makes the answer stable.
+            </p>
+
+            <h2 id="keeping-it-honest">Keeping the digest honest</h2>
+            <p>
+              A small model summarizing a newsletter will happily produce a confident sentence from a bare title. Several checks keep that out of the headlines:
+            </p>
+            <ul>
+              <li><strong>A headline needs a source.</strong> Only items with an article to read, coverage from another newsletter, or a full text the extractor read can become headlines. On one day two of the first six headlines had been one-line guesses from a link list, and one of them was wrong.</li>
+              <li><strong>Repeats must add facts.</strong> For a story seen in the previous days, the review model lists today’s concrete facts and keeps only those no earlier report stated. Asked for a verdict alone, it called all 19 repeated headlines from 15 to 22 October new; made to list and check, it found 9 with nothing new, each a genuine repeat.</li>
+              <li><strong>Titles are checked against the source.</strong> Over 468 re-extracted titles the back-translation check flagged 39, about nine of which had changed facts, such as $3.8m becoming $38,000.</li>
+              <li><strong>Rewrites fail closed.</strong> A headline rewrite is discarded when the fetch or model fails, when the model says the source is about something else, or when it answers in the wrong language, and it is never attempted when trimming would leave no source text.</li>
+              <li><strong>Script is corrected by clause.</strong> Traditional Chinese output that slips into Simplified is converted with zhconv-rs only in clauses that contain a Simplified-only character. Over 1,923 stored items this changed 46 fields and nothing else.</li>
+            </ul>
+
+            <h2 id="security-boundaries">Security boundaries</h2>
+            <p>
+              The pipeline reads untrusted email, follows links chosen by third parties, and holds OAuth tokens and a Discord credential, so most of its boundaries are explicit:
+            </p>
+            <ul>
+              <li><strong>Link following.</strong> Every redirect hop is validated like the first request: public addresses only, ports 80 and 443, no credentials, at most five hops. A script-based click page is parsed for its next hop, never executed. Downloads other than pages and PDFs are refused, so a digest never links an executable or archive.</li>
+              <li><strong>Subscriber privacy.</strong> Shown links drop campaign tags and the parameters that identify the recipient, such as HubSpot’s <code>_hsenc</code> and Mailchimp’s <code>mc_eid</code>. A link that is still a tracker after cleaning is not shown at all. Email bodies are never stored, only their hash and length.</li>
+              <li><strong>Local models by default.</strong> Ollama is reached locally and ignores proxy variables. A remote server requires an explicit opt-in and HTTPS, because email content would then leave the machine.</li>
+              <li><strong>Credentials.</strong> Discord webhooks must be HTTPS URLs on official Discord hosts with the standard path. OAuth tokens and the bot token live only in <code>0600</code> files outside the repository. Library loggers stay at WARNING because httpx logs full request URLs at INFO, and a webhook URL carries its token.</li>
+              <li><strong>Service sandboxing.</strong> Each systemd unit is sandboxed, and every exemption is documented with its reason. The GPU unit alone keeps device access; it also allows the scheduling calls PyTorch makes when the reranker loads, after a denied call killed one run with <code>SIGSYS</code> nine minutes in. The two long-running companion services answer only over Tailscale, and their home directory holds only the code and the few files they need.</li>
+            </ul>
+
+            <h2 id="failure-handling">Failure handling</h2>
+            <p>
+              A scheduled job has no one watching it, so failures are designed to be resumable and specific. Discord delivery is checkpointed per chunk and destination. A run that cannot finish ends on one line naming the error and its remedy, such as <code>AUTH_REAUTH_REQUIRED</code> or <code>LOCK_CONTENDED</code>, rather than a traceback.
+            </p>
+            <p>
+              Model timeouts get the same care. If extracting one email times out, the run ends without marking that email failed, because a stalled Ollama would otherwise fail every email. The next run gives it two tries and sends a one-token probe: if the model still answers, that one email is marked failed and the run continues; if it does not, Ollama is the problem and the email is kept for later.
+            </p>
+
+            <h2 id="testing">Testing and CI</h2>
+            <p>
+              Every pull request and push to main runs ruff formatting and lint checks, strict mypy, more than 1,100 tests and a package build. The tests also run on Python 3.11 and 3.13, the edges of the supported range, after 3.13 changed how symlink loops resolve and broke an assumption in a permissions test.
+            </p>
+            <p>
+              Line coverage cannot show whether a test would notice a wrong comparison or a missing check, so a weekly workflow runs mutation testing with mutmut over the modules that guard a security boundary: endpoint and webhook validation, Discord delivery and mention control, file permissions, OAuth tokens, the article fetcher’s network policy, and the two network-facing services. The workflow fails when any of those modules has code no test reaches. mutmut never changes validators, CLI commands, regexes or constants, so a clean report says nothing about them and they need tests of their own.
+            </p>
+
+            <h2 id="companion-tools">Companion tools</h2>
+            <p>
+              The repository grew into four commands with separate configuration, databases and OAuth clients. They share only small runtime helpers such as path resolution, Discord delivery and a process lock.
+            </p>
+            <div class="table-wrap wrap-labels">
+              <table>
+                <thead>
+                  <tr><th scope="col">Tool</th><th scope="col">Purpose</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>2much2read</td><td>The newsletter digest described on this page</td></tr>
+                  <tr><td>2busy1miss</td><td>Syncs Google Calendar into local reminder jobs, sends a next-day agenda, and tracks recurring to-dos that can be ticked off from a page over Tailscale</td></tr>
+                  <tr><td>2fun4distract</td><td>Records screen time from an iPhone, a Windows agent and a browser extension, then sends the previous day’s summary; the agent never reads window titles and the extension sends only domains</td></tr>
+                  <tr><td>2bored1made</td><td>Sends one-off notifications and recurring nudges that stop after a set number of deliveries</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h2 id="conclusion">Conclusion</h2>
+            <p>
+              Most of the work in 2Much2Read is not in calling a model but in deciding what the model is allowed to decide, measuring it, and failing safely when it is wrong. The duplicate judgement and the repeat check followed the same pattern: try the simplest approach, measure where it breaks on real data, and replace it with a narrower question the model answers reliably.
+            </p>
+
+            <div class="card-tags">
+              <span class="tag">Python</span>
+              <span class="tag">Ollama</span>
+              <span class="tag">sentence-transformers</span>
+              <span class="tag">Gmail API</span>
+              <span class="tag">SQLite</span>
+              <span class="tag">systemd</span>
+              <span class="tag">GitHub Actions</span>
+              <span class="tag">mutmut</span>
+            </div>
+
+            <h2 id="links">Links</h2>
+            <ul>
+              <li>Source: <a href="https://github.com/Bill-Lo-CA/2Much2Read" target="_blank" rel="noopener noreferrer">Bill-Lo-CA/2Much2Read</a> on GitHub</li>
+              <li>Privacy and terms for the Google integration: <a href="../../2much2read/">2Much2Read app page</a></li>
+              <li>Tools: <a href="https://ollama.com/" target="_blank" rel="noopener noreferrer">Ollama</a>, <a href="https://sbert.net/" target="_blank" rel="noopener noreferrer">sentence-transformers</a>, <a href="https://github.com/Gowee/zhconv-rs" target="_blank" rel="noopener noreferrer">zhconv-rs</a>, <a href="https://github.com/boxed/mutmut" target="_blank" rel="noopener noreferrer">mutmut</a></li>
+            </ul>
+
+            <a class="card-link" href="../../#2much2read">← Back to projects</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container footer-panel panel">
+      <div>© 2026 Bill Lo · Built as a static GitHub Pages portfolio.</div>
+      <div class="footer-links">
+        <a href="../../#projects">Projects</a>
+        <a href="../../#security">Security</a>
+        <a href="../../#skills">Skills</a>
+        <a href="../../#writing">Writing</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

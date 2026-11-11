@@ -1019,7 +1019,9 @@ footer {
 .article-body > p,
 .article-body > ul,
 .article-body > ol,
-.article-body > .table-wrap {
+.article-body > .table-wrap,
+.article-body > .flow,
+.article-body > .card-tags {
   margin-bottom: 18px;
 }
 
@@ -1139,6 +1141,10 @@ footer {
 
   .article-body {
     padding: 24px 20px 30px;
+  }
+
+  .article-body .wrap-labels td:first-child {
+    white-space: normal;
   }
 }
 
