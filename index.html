@@ -183,6 +183,56 @@
           </div>
         </article>
 
+        <article class="project-showcase panel" id="szechuan-sauce">
+          <div class="project-header">
+            <div>
+              <div class="project-meta">Featured · Digital Forensics · Incident Response</div>
+              <h3>Reconstructing a Windows Data Breach</h3>
+            </div>
+            <span class="status-chip status-active">Investigation published</span>
+          </div>
+
+          <p class="project-summary">
+            A solo DFIR investigation of DFIR Madness Case 001, The Stolen Szechuan Sauce: an RDP intrusion, malware persistence, lateral movement, and data theft rebuilt across a Windows domain controller and desktop from disk images, event logs, registry hives, and a packet capture.
+          </p>
+
+          <div class="case-grid">
+            <div class="case-item">
+              <span class="case-label">Problem</span>
+              <p>A secret recipe surfaced on the dark web. The evidence was two Windows hosts and a PCAP; the job was to establish whether there was a breach, how the attacker got in, what they did, and what they took.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Built</span>
+              <p>Verified every evidence hash, then parsed $UsnJrnl, $MFT, Security.evtx, and the SYSTEM/SOFTWARE hives with free tools and correlated them with the network capture.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Decision</span>
+              <p>Resolved a one-hour disagreement between host artifacts and the PCAP first: the hosts were set to Pacific time while the victim was on Mountain time, so every host timestamp was aligned to the capture before correlating.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Status</span>
+              <p>Full timeline of a sub-40-minute intrusion, down to a swapped, timestomped file, with immediate remediation and prevention recommendations. Final project for CST8806 Digital Forensics at Algonquin College.</p>
+            </div>
+          </div>
+
+          <div class="flow" aria-label="Attack chain reconstructed in the Szechuan Sauce case">
+            <span>RDP Brute Force</span><b>→</b><span>Metasploit Service</span><b>→</b><span>C2 over 443</span><b>→</b><span>Secret.zip Exfiltration</span><b>→</b><span>Pivot to Desktop</span>
+          </div>
+
+          <div class="card-tags">
+            <span class="tag">FTK Imager</span>
+            <span class="tag">Autopsy</span>
+            <span class="tag">Wireshark</span>
+            <span class="tag">Registry Explorer</span>
+            <span class="tag">EvtxECmd</span>
+            <span class="tag">MFTECmd</span>
+            <span class="tag">Timeline Explorer</span>
+          </div>
+          <div class="project-actions">
+            <a class="btn btn-primary" href="writeups/szechuan-sauce/">Read writeup</a>
+          </div>
+        </article>
+
         <article class="project-showcase panel" id="contextbubble">
           <div class="project-header">
             <div>
