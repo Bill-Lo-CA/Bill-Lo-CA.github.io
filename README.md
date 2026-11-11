@@ -17,6 +17,7 @@ The portfolio intentionally separates implemented work from planned experiments.
 
 ## Featured work
 
+- [2Much2Read](https://github.com/Bill-Lo-CA/2Much2Read) — local-first Gmail newsletter digest using Ollama extraction, reranking, and model-judged de-duplication, delivered to a private Discord channel; hardened with systemd sandboxing and mutation testing.
 - [ContextBubble](https://github.com/Bill-Lo-CA/contextbubble) — Chromium learning extension with caption-first ingestion, local ASR fallback, reviewed concept generation, and in-page overlays.
 - [SummerDay](https://github.com/Bill-Lo-CA/SummerDay) — local-first French lesson pipeline using SvelteKit, FastAPI, Stanza NLP, Ollama, and TTS review/publishing stages.
 - [Reconstructing a Windows Data Breach](https://bill-lo-ca.github.io/writeups/szechuan-sauce/) — solo DFIR investigation of DFIR Madness Case 001 (The Stolen Szechuan Sauce).

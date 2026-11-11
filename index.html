@@ -132,6 +132,57 @@
           </div>
         </div>
 
+        <article class="project-showcase panel" id="2much2read">
+          <div class="project-header">
+            <div>
+              <div class="project-meta">Featured · Local LLM Pipeline · Hardened Automation</div>
+              <h3>2Much2Read</h3>
+            </div>
+            <span class="status-chip status-active">In daily personal use</span>
+          </div>
+
+          <p class="project-summary">
+            A local-first pipeline that reads selected Gmail newsletters, extracts and ranks stories with local models, and posts one de-duplicated daily digest to a private Discord channel.
+            The same repository runs companion tools for Calendar reminders, to-dos, and screen-time summaries.
+          </p>
+
+          <div class="case-grid">
+            <div class="case-item">
+              <span class="case-label">Problem</span>
+              <p>Daily newsletters overlap heavily, mix in sponsored entries and tracking links, and bury the few stories worth reading.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Built</span>
+              <p>Ollama extraction, a sentence-transformers reranker, and a reviewer model loaded one at a time so they never share memory on an 8 GB GPU; SSRF-safe article fetching with tracker stripping; title checks; checkpointed Discord delivery.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Decision</span>
+              <p>Replaced token-overlap duplicate detection with a yes/no model judgement after measuring that a 0–100 score shifted more from swapping argument order than the gap a threshold would rely on.</p>
+            </div>
+            <div class="case-item">
+              <span class="case-label">Status</span>
+              <p>Runs daily on sandboxed systemd timers; 1,100+ tests, strict mypy, CI on Python 3.11 and 3.13, and weekly mutation testing over the security-boundary modules.</p>
+            </div>
+          </div>
+
+          <div class="flow" aria-label="2Much2Read digest pipeline">
+            <span>Gmail / Hacker News</span><b>→</b><span>Ollama Extract</span><b>→</b><span>Reranker</span><b>→</b><span>Review &amp; Merge</span><b>→</b><span>Discord Digest</span>
+          </div>
+
+          <div class="card-tags">
+            <span class="tag">Python</span>
+            <span class="tag">Ollama</span>
+            <span class="tag">sentence-transformers</span>
+            <span class="tag">Gmail API</span>
+            <span class="tag">SQLite</span>
+            <span class="tag">systemd</span>
+            <span class="tag">Mutation Testing</span>
+          </div>
+          <div class="project-actions">
+            <a class="btn btn-primary" href="https://github.com/Bill-Lo-CA/2Much2Read" target="_blank" rel="noopener noreferrer">View repository</a>
+          </div>
+        </article>
+
         <article class="project-showcase panel" id="contextbubble">
           <div class="project-header">
             <div>
